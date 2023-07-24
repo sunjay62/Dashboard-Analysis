@@ -21,6 +21,7 @@ import './sites.scss';
 import { FileImageOutlined, FilePdfOutlined, FileExcelOutlined, FileZipOutlined } from '@ant-design/icons';
 import ReactApexChart from 'react-apexcharts';
 import XLSX from 'xlsx';
+import { useTheme } from '@mui/material/styles';
 
 const TotalChart = () => {
   const [selectedSite, setSelectedSite] = useState('');
@@ -905,9 +906,16 @@ const TotalChart = () => {
     colors: ['#65e454'] // Ubah warna menjadi hijau
   };
 
+  const theme = useTheme();
+
   return (
     <div>
-      <MainCard title="Jakwifi Analysis">
+      <MainCard>
+        <Grid item xs={12} className="gridButton">
+          <div className="containerHeadSites">
+            <h2>Jakwifi Analyzer</h2>
+          </div>
+        </Grid>
         <ToastContainer />
         <div className="dateContainer">
           <div className="dateLeft">
@@ -953,7 +961,23 @@ const TotalChart = () => {
               <div className="cardHeader">
                 <h3>BW Usage</h3>
                 <div className="btnMenu">
-                  <Avatar variant="rounded" aria-controls="menu-traffic-card" aria-haspopup="true" onClick={handleClickTraffic}>
+                  <Avatar
+                    variant="rounded"
+                    aria-controls="menu-traffic-card"
+                    aria-haspopup="true"
+                    onClick={handleClickTraffic}
+                    sx={{
+                      ...theme.typography.commonAvatar,
+                      ...theme.typography.mediumAvatar,
+                      transition: 'all .2s ease-in-out',
+                      background: theme.palette.secondary.light,
+                      color: theme.palette.secondary.dark,
+                      '&:hover': {
+                        background: theme.palette.secondary.dark,
+                        color: theme.palette.secondary.light
+                      }
+                    }}
+                  >
                     <MoreHorizIcon fontSize="inherit" />
                   </Avatar>
                   <Menu
@@ -991,7 +1015,23 @@ const TotalChart = () => {
               <div className="cardHeader">
                 <h3>Device Connected</h3>
                 <div className="btnMenu">
-                  <Avatar variant="rounded" aria-controls="menu-device-card" aria-haspopup="true" onClick={handleClickDevice}>
+                  <Avatar
+                    variant="rounded"
+                    aria-controls="menu-device-card"
+                    aria-haspopup="true"
+                    onClick={handleClickDevice}
+                    sx={{
+                      ...theme.typography.commonAvatar,
+                      ...theme.typography.mediumAvatar,
+                      transition: 'all .2s ease-in-out',
+                      background: theme.palette.secondary.light,
+                      color: theme.palette.secondary.dark,
+                      '&:hover': {
+                        background: theme.palette.secondary.dark,
+                        color: theme.palette.secondary.light
+                      }
+                    }}
+                  >
                     <MoreHorizIcon fontSize="inherit" />
                   </Avatar>
                   <Menu

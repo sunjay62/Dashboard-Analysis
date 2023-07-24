@@ -5,6 +5,7 @@ import PrivateRoutes from './Privateroutes';
 // project imports
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
+import Profile from 'views/utilities/profile/Profile';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -19,6 +20,7 @@ const UtilsSites = Loadable(lazy(() => import('views/utilities/sites/Sites')));
 const UtilsNewSites = Loadable(lazy(() => import('views/utilities/newsites/NewSites')));
 const UtilsAdministrator = Loadable(lazy(() => import('views/utilities/account/Account')));
 const TotalChart = Loadable(lazy(() => import('views/utilities/totalchart/TotalChart')));
+const EditProfile = Loadable(lazy(() => import('views/utilities/editprofile/EditProfile')));
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const Login = Loadable(lazy(() => import('views/pages/login/Login')));
 const NotFound = Loadable(lazy(() => import('views/pages/notfound/Notfound')));
@@ -68,6 +70,24 @@ const MainRoutes = {
                 {
                   path: 'administrator',
                   element: <UtilsAdministrator />
+                }
+              ]
+            },
+            {
+              path: 'setting',
+              children: [
+                {
+                  path: 'profile',
+                  element: <Profile />
+                }
+              ]
+            },
+            {
+              path: 'edit/profile',
+              children: [
+                {
+                  path: ':id',
+                  element: <EditProfile />
                 }
               ]
             },

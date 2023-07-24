@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { Button, Modal, Form, Input } from 'antd';
 import MainCard from 'ui-component/cards/MainCard';
@@ -14,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Popconfirm } from 'antd';
 import useAxiosPrivate from '../../../hooks/useAxiosPrivate';
 import './account.scss';
+import { useNavigate } from 'react-router-dom';
 
 const Account = () => {
   const [fullname, setFullname] = useState('');
@@ -22,21 +23,69 @@ const Account = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const axiosPrivate = useAxiosPrivate(); // const refresh = useRefreshToken();
+  const formRef = useRef(null); // Buat referensi untuk form instance
+  const [fullnameValid, setFullnameValid] = useState(false);
+  const [emailValid, setEmailValid] = useState(false);
+  const [passwordValid, setPasswordValid] = useState(false);
+  const navigate = useNavigate();
+
+  const handleShowEdit = (id) => {
+    navigate(`/edit/profile/${id}`);
+  };
 
   const showModal = () => {
     setIsModalOpen(true);
   };
+
   const handleOk = () => {
-    if (!fullname || !email || !password) {
+    if (!fullname || !email || !password || !fullnameValid || !emailValid || !passwordValid) {
       toast.error('Please fill in all fields.');
       return;
+    }
+
+    if (formRef.current) {
+      formRef.current.submit();
     }
 
     handleSubmit();
     setIsModalOpen(false);
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
+    setName('');
+    setIdData('');
+  };
+
+  const handleFullnameChange = (event) => {
+    const value = event.target.value;
+    setFullname(value);
+    setFullnameValid(!!value); // Set status validasi menjadi true jika value tidak kosong
+  };
+
+  const isEmailValid = (value) => {
+    // Regex untuk memeriksa email yang valid
+    const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    return emailPattern.test(value);
+  };
+
+  const handleEmailChange = (event) => {
+    const value = event.target.value;
+    setEmail(value);
+    setEmailValid(isEmailValid(value));
+  };
+
+  // Fungsi untuk memeriksa apakah password sudah terdiri dari huruf kapital dan angka atau belum
+  const isPasswordValid = (value) => {
+    // Regex untuk memeriksa minimal 1 huruf kapital dan 1 angka
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return passwordPattern.test(value);
+  };
+
+  const handlePasswordChange = (event) => {
+    const value = event.target.value;
+    setPassword(value);
+    setPasswordValid(isPasswordValid(value));
   };
 
   // FUNGSI UNTUK UPDATE DATA SETELAH ACTION
@@ -104,7 +153,12 @@ const Account = () => {
     { field: 'id', headerName: 'ID', flex: 1 },
     { field: 'fullname', headerName: 'Full Name', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1 },
-    { field: 'active', headerName: 'Status', flex: 1 }
+    {
+      field: 'active',
+      headerName: 'Status',
+      flex: 1,
+      valueGetter: (params) => (params.value ? 'Active' : 'Disable')
+    }
 
     // ini contoh kalo pengen dapetin value dari 2 row di jadikan satu
     // {
@@ -177,6 +231,8 @@ const Account = () => {
   //     { id: 'TCF-10003', public_ip: '101.255.255.233', name: 'TCR-1037 Jakwifi Site Kec Kepulauan Seribu Utara RW 007' }
   //   ];
 
+  // INI UNTUK UPDATE DATA
+
   const actionColumn = [
     {
       field: 'action',
@@ -188,10 +244,7 @@ const Account = () => {
             <div className="cellAction">
               <Tooltip title="Edit" arrow>
                 <div className="viewButtonOperator">
-                  <DriveFileRenameOutlineIcon
-                    className="viewIcon"
-                    // onClick={() => handleShowEdit(rowData.id)}
-                  />
+                  <DriveFileRenameOutlineIcon className="viewIcon" onClick={() => handleShowEdit(rowData.id)} />
                 </div>
               </Tooltip>
               <Tooltip title="Delete" arrow>
@@ -244,60 +297,79 @@ const Account = () => {
     }
   };
 
-  const validateMessages = {
-    required: '${label} is required!',
-    types: {
-      email: '${label} is not a valid email!'
-    }
-  };
-
   return (
-    <MainCard title="Account Adminstrator">
+    <MainCard>
       <ToastContainer />
       <Modal title="Input New Account" centered onOk={handleOk} onCancel={handleCancel} open={isModalOpen}>
         <Form
           {...layout}
           name="nest-messages"
+          ref={formRef} // Menghubungkan formRef dengan Form instance
           style={{
             maxWidth: 600,
             marginTop: 25
           }}
-          validateMessages={validateMessages}
         >
           <Form.Item
-            name={['user', 'fullname']}
             label="Full Name"
             rules={[
               {
-                required: true
+                required: true,
+                message: 'Please input the Fullname!'
               }
             ]}
+            validateStatus={!fullnameValid ? 'error' : ''}
+            help={!fullnameValid ? 'Fullname is required!' : ''}
           >
-            <Input value={fullname} onChange={(e) => setFullname(e.target.value)} />
-          </Form.Item>
-          <Form.Item name={['user', 'email']} label="Email" rules={[{ required: true, type: 'email' }]}>
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input value={fullname} onChange={handleFullnameChange} />
           </Form.Item>
           <Form.Item
-            label="Password"
-            name="password"
+            label="Email Address"
             rules={[
               {
                 required: true,
-                message: 'Please input your password!'
+                validator: (_, value) => {
+                  if (isEmailValid(value)) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Please input a valid Email address!'));
+                }
               }
             ]}
+            validateStatus={!emailValid ? 'error' : ''}
+            help={!emailValid ? 'Email is required' : ''}
           >
-            <Input.Password value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input value={email} onChange={handleEmailChange} />
+          </Form.Item>
+          <Form.Item
+            label="Password"
+            rules={[
+              {
+                required: true,
+                validator: (_, value) => {
+                  if (isPasswordValid(value)) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Password must consist of uppercase letters and numbers!'));
+                }
+              }
+            ]}
+            validateStatus={!passwordValid ? 'error' : ''}
+            help={!passwordValid ? 'Password is required' : ''}
+          >
+            <Input.Password value={password} onChange={handlePasswordChange} />
           </Form.Item>
         </Form>
       </Modal>
 
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12} className="gridButton">
-          <Button type="primary" icon={<PlusCircleOutlined />} onClick={showModal}>
-            Add New
-          </Button>
+          <div className="containerHeadAccount">
+            <h2>List Account</h2>
+            <Button type="primary" icon={<PlusCircleOutlined />} onClick={showModal}>
+              Add New
+            </Button>
+          </div>
         </Grid>
         <Grid item xs={12}>
           <DataGrid

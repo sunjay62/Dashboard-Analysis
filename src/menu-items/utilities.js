@@ -56,10 +56,18 @@ const utilities = {
       id: 'util-color',
       title: 'Setting',
       type: 'item',
-      url: '/utils/util-color',
+      url: '/setting/profile',
       icon: icons.SettingsOutlinedIcon,
       breadcrumbs: false
     }
+    // {
+    //   id: 'util-color',
+    //   title: 'Setting',
+    //   type: 'item',
+    //   url: '/utils/util-color',
+    //   icon: icons.SettingsOutlinedIcon,
+    //   breadcrumbs: false
+    // }
     // {
     //   id: 'util-shadow',
     //   title: 'Shadow',

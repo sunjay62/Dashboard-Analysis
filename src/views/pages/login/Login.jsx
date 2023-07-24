@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -18,6 +18,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import './login.scss';
 import useAxiosPrivate from 'hooks/useAxiosPrivate';
 import { useNavigate } from 'react-router-dom';
+import UserContext from 'UserContext';
 
 function Copyright(props) {
   return (
@@ -40,6 +41,7 @@ export default function Login() {
   const [remember, setRemember] = useState(false);
   const axiosPrivate = useAxiosPrivate(); // const refresh = useRefreshToken();
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -57,19 +59,18 @@ export default function Login() {
         remember
       });
 
-      //   console.log(response.status);
-
-      if (response.status === 200) {
+      if (response.data && response.data.access_token) {
         const setTokens = (access_token, refresh_token) => {
-          // Set access dan refresh token in local storage
+          // Set access and refresh token in local storage
           localStorage.setItem('access_token', access_token);
           localStorage.setItem('refresh_token', refresh_token);
         };
+        // Set user data in the local state
+        setUser(response.data);
         setTokens(response.data.access_token, response.data.refresh_token);
         navigate('/home');
-        // console.log(response.data);
       } else {
-        console.log(response.data);
+        console.log('Invalid response data:', response.data);
       }
     } catch (error) {
       if (error.response === 401) {

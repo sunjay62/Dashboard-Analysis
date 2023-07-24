@@ -36,7 +36,7 @@ import Transitions from 'ui-component/extended/Transitions';
 import User1 from 'assets/images/admin.jpg';
 
 // assets
-import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
+import { IconLogout, IconSearch, IconSettings } from '@tabler/icons';
 // import useAxiosPrivate from 'hooks/useAxiosPrivate';
 
 // ==============================|| PROFILE MENU ||============================== //
@@ -61,6 +61,9 @@ const ProfileSection = () => {
     localStorage.removeItem('refresh_token');
     navigate('/login');
   };
+  // const handleSettingProfile = async () => {
+  //   navigate('/setting/profile');
+  // };
   // const handleLogout = async () => {
   //   console.log('Logout');
 
@@ -107,7 +110,7 @@ const ProfileSection = () => {
     handleClose(event);
 
     if (route && route !== '') {
-      navigate(route);
+      navigate('/setting/profile');
     }
   };
   const handleToggle = () => {
@@ -220,11 +223,11 @@ const ProfileSection = () => {
                   </Box>
                   <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
                     <Box sx={{ p: 2 }}>
-                      <Divider />
                       <Card
                         sx={{
                           bgcolor: theme.palette.primary.light,
-                          my: 2
+                          my: 2,
+                          mt: -2
                         }}
                       >
                         <CardContent>
@@ -289,34 +292,6 @@ const ProfileSection = () => {
                             <IconSettings stroke={1.5} size="1.3rem" />
                           </ListItemIcon>
                           <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
-                        </ListItemButton>
-                        <ListItemButton
-                          sx={{ borderRadius: `${customization.borderRadius}px` }}
-                          selected={selectedIndex === 1}
-                          onClick={(event) => handleListItemClick(event, 1, '#')}
-                        >
-                          <ListItemIcon>
-                            <IconUser stroke={1.5} size="1.3rem" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Grid container spacing={1} justifyContent="space-between">
-                                <Grid item>
-                                  <Typography variant="body2">Social Profile</Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Chip
-                                    label="02"
-                                    size="small"
-                                    sx={{
-                                      bgcolor: theme.palette.warning.dark,
-                                      color: theme.palette.background.default
-                                    }}
-                                  />
-                                </Grid>
-                              </Grid>
-                            }
-                          />
                         </ListItemButton>
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
