@@ -3,7 +3,7 @@ import './editprofile.scss';
 import MainCard from 'ui-component/cards/MainCard';
 import { Grid } from '@mui/material';
 import { gridSpacing } from 'store/constant';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, Select } from 'antd';
 import useAxiosPrivate from 'hooks/useAxiosPrivate';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -20,6 +20,7 @@ const EditProfile = () => {
   const [passwordDisabled, setPasswordDisabled] = useState(false);
   const axiosPrivate = useAxiosPrivate(); // const refresh = useRefreshToken();
   const navigate = useNavigate();
+  const { Option } = Select;
 
   // GET DATA
   useEffect(() => {
@@ -115,7 +116,7 @@ const EditProfile = () => {
               <Form disabled={!componentDisabled}>
                 <div className="input">
                   <label htmlFor="id">ID :</label>
-                  <Input id="id" value={id} />
+                  <Input id="id" value={id} disabled />
                 </div>
                 <div className="input">
                   <label htmlFor="fullname">Full Name :</label>
@@ -127,7 +128,10 @@ const EditProfile = () => {
                 </div>
                 <div className="input">
                   <label htmlFor="status">Status :</label>
-                  <Input id="status" value={active ? 'Active' : 'Disable'} />
+                  <Select id="status" value={active ? 'Active' : 'Disable'}>
+                    <Option value="Active">Active</Option>
+                    <Option value="Disable">Disable</Option>
+                  </Select>
                 </div>
                 <div className="input">
                   <Checkbox checked={passwordDisabled} onChange={(e) => setPasswordDisabled(e.target.checked)}>

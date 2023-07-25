@@ -20,6 +20,7 @@ const UtilsSites = Loadable(lazy(() => import('views/utilities/sites/Sites')));
 const UtilsNewSites = Loadable(lazy(() => import('views/utilities/newsites/NewSites')));
 const UtilsAdministrator = Loadable(lazy(() => import('views/utilities/account/Account')));
 const TotalChart = Loadable(lazy(() => import('views/utilities/totalchart/TotalChart')));
+const Analytics = Loadable(lazy(() => import('views/utilities/analytics/Analytics')));
 const EditProfile = Loadable(lazy(() => import('views/utilities/editprofile/EditProfile')));
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const Login = Loadable(lazy(() => import('views/pages/login/Login')));
@@ -51,7 +52,7 @@ const MainRoutes = {
               path: 'jakwifi',
               children: [
                 {
-                  path: 'analysis',
+                  path: 'usage',
                   element: <UtilsSites />
                 },
                 {
@@ -61,6 +62,10 @@ const MainRoutes = {
                 {
                   path: 'totalchart',
                   element: <TotalChart />
+                },
+                {
+                  path: 'analytics',
+                  element: <Analytics />
                 }
               ]
             },

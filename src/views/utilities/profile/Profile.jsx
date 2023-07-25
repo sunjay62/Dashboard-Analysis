@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import './profile.scss';
 import MainCard from 'ui-component/cards/MainCard';
 import { Grid } from '@mui/material';
@@ -17,35 +17,58 @@ const Profile = () => {
   const { user } = useContext(UserContext);
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
-  const [fullnameEdit, setFullnameEdit] = useState(''); // Initialize with an empty string
-  const [emailEdit, setEmailEdit] = useState(''); // Initialize with an empty string
-  const [passwordEdit, setPasswordEdit] = useState('');
+  const [fullname, setFullname] = useState('');
+  const [email, setEmail] = useState('');
+  const [id, setId] = useState('');
+  const [active, setActive] = useState('');
+  const [password, setPassword] = useState('');
+  const userRef = useRef(null);
 
   useEffect(() => {
-    // Check if the user object is not null before setting the states
     if (user) {
-      setFullnameEdit(user.fullname); // Update the value with the user's current fullname
-      setEmailEdit(user.email); // Update the value with the user's current email
+      const accessToken = localStorage.getItem('access_token');
+      const userId = user.id;
+      const apiUrl = `/administrator/${userId}`;
+
+      axiosPrivate
+        .get(apiUrl, {
+          headers: {
+            Authorization: accessToken
+          }
+        })
+        .then((response) => {
+          userRef.current = response.data;
+          console.log(response.data);
+          setEmail(response.data.email);
+          setFullname(response.data.fullname);
+          setId(response.data.id);
+          setActive(response.data.active);
+          localStorage.setItem('user', JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.error('Failed to fetch user data:', error);
+        });
     }
-  }, [user]); // Run this effect whenever the 'user' object changes
+  }, [user]);
 
-  const getUpperCaseUserId = () => {
-    return user ? user.id.toUpperCase() : '';
-  };
+  useEffect(() => {
+    // Ambil data user dari localStorage saat komponen di-mounting
+    const storedUser = JSON.parse(localStorage.getItem('user'));
 
-  const getUpperCaseUserFullname = () => {
-    return user ? user.fullname.toUpperCase() : '';
-  };
-
-  const getUserActiveStatus = () => {
-    return user ? user.active : false;
-  };
+    if (storedUser) {
+      userRef.current = storedUser;
+      setEmail(storedUser.email);
+      setFullname(storedUser.fullname);
+      setId(storedUser.id);
+      setActive(storedUser.active);
+    }
+  }, []);
 
   // UPDATE DATA
   const handleSubmit = (event) => {
     event.preventDefault();
     const accessToken = localStorage.getItem('access_token');
-    const updatedUserData = { id: user.id, fullname: fullnameEdit, email: emailEdit, password: passwordEdit };
+    const updatedUserData = { id, fullname, email, password };
     axiosPrivate
       .put(`/administrator`, updatedUserData, {
         headers: {
@@ -56,29 +79,32 @@ const Profile = () => {
       .then((response) => {
         if (response.status === 200) {
           toast.success('Updated Successfully.');
-          setTimeout(() => {
-            navigate(`/account/administrator`);
-          }, 2000);
+          userRef.current = updatedUserData;
+          setEmail(updatedUserData.email);
+          setFullname(updatedUserData.fullname);
+          setId(updatedUserData.id);
+          setActive(updatedUserData.active);
+          localStorage.setItem('user', JSON.stringify(response.data));
         } else {
-          toast.error('Failed to update, please try again.'); // Use toast.error for error messages
+          toast.error('Failed to update, please try again.');
         }
       })
       .catch((err) => {
-        toast.error('Failed to update, please try again.'); // Use toast.error for error messages
+        toast.error('Failed to update, please try again.');
         console.log(err);
       });
   };
 
   const handleNameChangeEdit = (event) => {
-    setFullnameEdit(event.target.value);
+    setFullname(event.target.value);
   };
 
   const handleEmailChangeEdit = (event) => {
-    setEmailEdit(event.target.value);
+    setEmail(event.target.value);
   };
 
   const handlePasswordChangeEdit = (event) => {
-    setPasswordEdit(event.target.value);
+    setPassword(event.target.value);
   };
 
   const toHome = () => {
@@ -97,8 +123,8 @@ const Profile = () => {
         <Grid item xs={12} className="containerBottomProfile">
           <div className="profileLeft">
             <div className="imgContainer"></div>
-            <p>{getUpperCaseUserFullname()}</p>
-            <p>{getUpperCaseUserId()}</p>
+            <p>{fullname}</p>
+            <p>{id}</p>
           </div>
           <div className="profileRight">
             <div className="rightTop">
@@ -118,19 +144,19 @@ const Profile = () => {
               <Form disabled={!componentDisabled}>
                 <div className="input">
                   <label htmlFor="id">ID :</label>
-                  <Input id="id" value={getUpperCaseUserId()} />
+                  <Input id="id" value={id} disabled />
                 </div>
                 <div className="input">
                   <label htmlFor="fullname">Full Name :</label>
-                  <Input id="fullname" value={fullnameEdit} onChange={handleNameChangeEdit} />
+                  <Input id="fullname" value={fullname} onChange={handleNameChangeEdit} />
                 </div>
                 <div className="input">
                   <label htmlFor="email">Email :</label>
-                  <Input id="email" value={emailEdit} onChange={handleEmailChangeEdit} />
+                  <Input id="email" value={email} onChange={handleEmailChangeEdit} />
                 </div>
                 <div className="input">
                   <label htmlFor="status">Status :</label>
-                  <Input id="status" value={getUserActiveStatus() ? 'Active' : 'Disable'} disabled />
+                  <Input id="status" value={active ? 'Active' : 'Disable'} disabled />
                 </div>
                 <div className="input">
                   <Checkbox checked={passwordDisabled} onChange={(e) => setPasswordDisabled(e.target.checked)}>

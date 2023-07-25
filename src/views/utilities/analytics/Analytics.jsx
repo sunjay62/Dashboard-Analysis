@@ -17,13 +17,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
 import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import './sites.scss';
+import './analytics.scss';
 import { FileImageOutlined, FilePdfOutlined, FileExcelOutlined, FileZipOutlined } from '@ant-design/icons';
 import ReactApexChart from 'react-apexcharts';
 import XLSX from 'xlsx';
 import { useTheme } from '@mui/material/styles';
 
-const TotalChart = () => {
+const Analytics = () => {
   const [selectedSite, setSelectedSite] = useState('');
   const [selectedRange, setSelectedRange] = useState([]);
   const [dataTraffic, setDataTraffic] = useState([]);
@@ -913,7 +913,7 @@ const TotalChart = () => {
       <MainCard>
         <Grid item xs={12} className="gridButton">
           <div className="containerHeadSites">
-            <h2>JakWifi Usage</h2>
+            <h2>JakWifi Web Analytics</h2>
           </div>
         </Grid>
         <ToastContainer />
@@ -1070,4 +1070,4 @@ const TotalChart = () => {
   );
 };
 
-export default TotalChart;
+export default Analytics;

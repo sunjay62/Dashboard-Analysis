@@ -30,9 +30,9 @@ const utilities = {
       children: [
         {
           id: 'util-site',
-          title: 'Analysis',
+          title: 'Usage',
           type: 'item',
-          url: '/jakwifi/analysis',
+          url: '/jakwifi/usage',
           breadcrumbs: true
         },
         {
@@ -40,6 +40,13 @@ const utilities = {
           title: 'Sites',
           type: 'item',
           url: '/jakwifi/sites',
+          breadcrumbs: true
+        },
+        {
+          id: 'util-web-analytics',
+          title: 'Web Analytics',
+          type: 'item',
+          url: '/jakwifi/analytics',
           breadcrumbs: true
         }
       ]
