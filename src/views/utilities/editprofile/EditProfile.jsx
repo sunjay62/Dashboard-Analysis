@@ -6,9 +6,10 @@ import { gridSpacing } from 'store/constant';
 import { Button, Checkbox, Form, Input, Select } from 'antd';
 import useAxiosPrivate from 'hooks/useAxiosPrivate';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 
 const EditProfile = () => {
   const [fullname, setFullname] = useState('');
@@ -20,12 +21,22 @@ const EditProfile = () => {
   const [passwordDisabled, setPasswordDisabled] = useState(false);
   const axiosPrivate = useAxiosPrivate(); // const refresh = useRefreshToken();
   const navigate = useNavigate();
+  const [statusValue, setStatusValue] = useState(active ? 'Active' : 'Disable');
   const { Option } = Select;
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordDisabled, setShowPasswordDisabled] = useState(true);
+
+  useEffect(() => {
+    setShowPasswordDisabled(passwordDisabled);
+  }, [passwordDisabled]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   // GET DATA
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
-    console.log(accessToken);
     axiosPrivate
       .get(`/administrator/${id}`, {
         headers: {
@@ -38,6 +49,7 @@ const EditProfile = () => {
         setEmail(res.data.email);
         setPassword(res.data.password);
         setActive(res.data.active);
+        setStatusValue(res.data.active ? 'Active' : 'Disable'); // Update statusValue based on the 'active' value from response
       })
       .catch((err) => console.log(err));
   }, [id]);
@@ -46,7 +58,8 @@ const EditProfile = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     const accessToken = localStorage.getItem('access_token');
-    const updatedUserData = { id, fullname, email, password };
+    const updatedUserData = { id, fullname, email, password, active };
+    console.log('Data being sent:', updatedUserData);
     axiosPrivate
       .put(`/administrator`, updatedUserData, {
         headers: {
@@ -59,7 +72,7 @@ const EditProfile = () => {
           toast.success('Updated Successfully.');
           setTimeout(() => {
             navigate(`/account/administrator`);
-          }, 2000);
+          }, 1000);
         } else {
           setError('Failed to update, please try again.');
         }
@@ -79,13 +92,17 @@ const EditProfile = () => {
     setPassword(event.target.value);
   };
 
+  const handleStatusChange = (value) => {
+    setStatusValue(value);
+    setActive(value === true);
+  };
+
   const toHome = () => {
     navigate('/account/administrator');
   };
 
   return (
     <MainCard>
-      <ToastContainer />
       <Grid container spacing={gridSpacing}>
         <Grid item xs={12}>
           <div className="containerHeadEditProfile">
@@ -128,16 +145,28 @@ const EditProfile = () => {
                 </div>
                 <div className="input">
                   <label htmlFor="status">Status :</label>
-                  <Select id="status" value={active ? 'Active' : 'Disable'}>
-                    <Option value="Active">Active</Option>
-                    <Option value="Disable">Disable</Option>
+                  <Select id="status" value={statusValue} onChange={handleStatusChange}>
+                    <Option value={true}>Active</Option>
+                    <Option value={false}>Disable</Option>
                   </Select>
                 </div>
                 <div className="input">
                   <Checkbox checked={passwordDisabled} onChange={(e) => setPasswordDisabled(e.target.checked)}>
-                    Change Password :
+                    Edit Password :
                   </Checkbox>
-                  <Input id="password" value={password} onChange={handlePasswordChange} disabled={!passwordDisabled} />
+                  <Input.Password
+                    id="password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    disabled={!showPasswordDisabled}
+                    iconRender={(visible) =>
+                      visible ? (
+                        <EyeOutlined onClick={togglePasswordVisibility} />
+                      ) : (
+                        <EyeInvisibleOutlined onClick={togglePasswordVisibility} />
+                      )
+                    }
+                  />
                 </div>
                 <div className="submitBtn">
                   <Button onClick={handleSubmit}>Save Profile</Button>

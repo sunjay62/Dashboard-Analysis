@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Avatar, Menu, MenuItem, Grid } from '@mui/material';
-import { DatePicker, Space, Select, Button, Dropdown } from 'antd';
+import { DatePicker, Space, Select, Dropdown } from 'antd';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import axiosNew from '../../../api/axiosNew';
@@ -8,12 +8,11 @@ import { pdf, Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer
 import { Image as PDFImage } from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
 import ApexCharts from 'apexcharts';
-import { SearchOutlined } from '@ant-design/icons';
+// import { SearchOutlined } from '@ant-design/icons';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import GetAppTwoToneIcon from '@mui/icons-material/GetAppOutlined';
 import ArchiveTwoToneIcon from '@mui/icons-material/ArchiveOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -23,7 +22,7 @@ import ReactApexChart from 'react-apexcharts';
 import XLSX from 'xlsx';
 import { useTheme } from '@mui/material/styles';
 
-const TotalChart = () => {
+const Sites = () => {
   const [selectedSite, setSelectedSite] = useState('');
   const [selectedRange, setSelectedRange] = useState([]);
   const [dataTraffic, setDataTraffic] = useState([]);
@@ -65,6 +64,76 @@ const TotalChart = () => {
   const onChangeRange = (dates, dateStrings) => {
     setSelectedRange(dateStrings);
   };
+
+  useEffect(() => {
+    // Check if both start and end dates are selected
+    if (selectedRange.length === 2) {
+      // Perform the search automatically
+      onSearch();
+    }
+  }, [selectedRange]);
+
+  useEffect(() => {
+    // Check if selectedSite has a value
+    if (selectedSite !== null) {
+      // Perform the search automatically
+      onSearch();
+    }
+  }, [selectedSite]);
+
+  const handleSearchOnLoad = async () => {
+    const requestData = {
+      start_data: '01/2022',
+      end_data: '06/2023',
+      site_id: 'TCF-11083'
+    };
+
+    console.log(requestData);
+
+    try {
+      const response = await axiosNew.post('/monthly', requestData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const responseData = response.data;
+      console.log(response);
+      // setTableData(responseData.data);
+
+      // Update dataTraffic
+      const trafficData = responseData.data.find((item) => item.name === 'BW usage per GB');
+      const updatedDataTraffic = trafficData.data.map((item) => ({
+        month: item.month,
+        data: item.data
+        // totalDevices: item.totalDevices
+      }));
+
+      // Update dataDevice
+      const deviceData = responseData.data.find((item) => item.name === 'device');
+      const updatedDataDevice = deviceData.data.map((item) => ({
+        month: item.month,
+        data: item.data
+        // totalDevices: item.totalDevices
+      }));
+
+      setDataTraffic(updatedDataTraffic);
+      setDataDevice(updatedDataDevice);
+
+      // Update site name and public IP based on selected site
+      const selectedOption = sites.find((site) => site.value === selectedSite);
+      if (selectedOption) {
+        setSiteName(selectedOption.label);
+        setSitePublicIP(selectedOption.publicIP);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    handleSearchOnLoad();
+  }, []);
 
   const onMenuClick = async (e) => {
     const { key } = e;
@@ -164,6 +233,7 @@ const TotalChart = () => {
       link.href = csvData;
       link.download = `${siteName}.csv`;
       link.click();
+      toast.success('Download Successfully!');
     } catch (error) {
       console.error(error);
       if (error.response && error.response.status === 422) {
@@ -248,6 +318,7 @@ const TotalChart = () => {
       link.href = blobUrl;
       link.download = `${siteName}.xlsx`;
       link.click();
+      toast.success('Download Successfully!');
     } catch (error) {
       console.error(error);
       if (error.response && error.response.status === 422) {
@@ -318,7 +389,7 @@ const TotalChart = () => {
       URL.revokeObjectURL(url);
 
       if (response.status === 200) {
-        toast.success('Download Successfully.');
+        toast.success('Download Successfully!');
       }
     } catch (error) {
       console.error(error);
@@ -389,7 +460,7 @@ const TotalChart = () => {
       // Merelease objek URL
       URL.revokeObjectURL(url);
       if (response.status === 200) {
-        toast.success('Download Successfully.');
+        toast.success('Download Successfully!');
       }
     } catch (error) {
       console.error(error);
@@ -413,9 +484,11 @@ const TotalChart = () => {
         link.href = imgData;
         link.download = `${siteName}.png`;
         link.click();
+        toast.success('Download Successfully!');
       })
       .catch((error) => {
         console.log(error);
+        toast.error('Failed to download Chart. Please try again.');
       });
   };
 
@@ -636,15 +709,15 @@ const TotalChart = () => {
           link.href = blobUrl;
           link.download = `${siteName}.pdf`;
           link.click();
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error('Failed to generate the PDF. Please try again.');
         });
+      toast.success('Download Successfully!');
     } catch (error) {
       console.error(error);
-      if (error.response && error.response.status === 422) {
-        toast.error('Please Input Site and Date Range!');
-      } else {
-        toast.error('Failed to download PDF. Please try again.');
-        console.log(error);
-      }
+      toast.error('Failed to download PDF. Please try again.');
     }
   };
 
@@ -659,6 +732,8 @@ const TotalChart = () => {
       end_data: endData,
       site_id: selectedSite
     };
+
+    console.log(requestData);
 
     try {
       const response = await axiosNew.post('/monthly', requestData, {
@@ -916,7 +991,6 @@ const TotalChart = () => {
             <h2>JakWifi Usage</h2>
           </div>
         </Grid>
-        <ToastContainer />
         <div className="dateContainer">
           <div className="dateLeft">
             <Select
@@ -942,7 +1016,7 @@ const TotalChart = () => {
           </div>
           <Space size={12} className="dateRight">
             <RangePicker picker="month" onChange={onChangeRange} format="MM/YYYY" />
-            <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={onSearch} />
+            {/* <Button type="primary" shape="circle" icon={<SearchOutlined />} onClick={onSearch} /> */}
           </Space>
         </div>
         <Grid container spacing={gridSpacing}>
@@ -1070,4 +1144,4 @@ const TotalChart = () => {
   );
 };
 
-export default TotalChart;
+export default Sites;

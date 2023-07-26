@@ -36,6 +36,13 @@ const utilities = {
           breadcrumbs: true
         },
         {
+          id: 'util-allsites',
+          title: 'All Usage',
+          type: 'item',
+          url: '/jakwifi/allusage',
+          breadcrumbs: true
+        },
+        {
           id: 'util-add-site',
           title: 'Sites',
           type: 'item',

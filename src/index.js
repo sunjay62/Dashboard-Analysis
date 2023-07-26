@@ -13,6 +13,8 @@ import { store } from 'store';
 import 'assets/scss/style.scss';
 import config from './config';
 import { AuthProvider } from 'context/AuthProvider';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // ==============================|| REACT DOM RENDER  ||============================== //
 
@@ -23,6 +25,7 @@ root.render(
     <BrowserRouter basename={config.basename}>
       <AuthProvider>
         <App />
+        <ToastContainer />
       </AuthProvider>
     </BrowserRouter>
   </Provider>

@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 
 const Profile = () => {
   const [componentDisabled, setComponentDisabled] = useState(false);
@@ -23,6 +24,16 @@ const Profile = () => {
   const [active, setActive] = useState('');
   const [password, setPassword] = useState('');
   const userRef = useRef(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordDisabled, setShowPasswordDisabled] = useState(true);
+
+  useEffect(() => {
+    setShowPasswordDisabled(passwordDisabled);
+  }, [passwordDisabled]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   useEffect(() => {
     if (user) {
@@ -160,9 +171,21 @@ const Profile = () => {
                 </div>
                 <div className="input">
                   <Checkbox checked={passwordDisabled} onChange={(e) => setPasswordDisabled(e.target.checked)}>
-                    Change Password :
+                    Edit Password :
                   </Checkbox>
-                  <Input id="password" disabled={!passwordDisabled} onChange={handlePasswordChangeEdit} />
+                  <Input.Password
+                    id="password"
+                    value={password}
+                    onChange={handlePasswordChangeEdit}
+                    disabled={!showPasswordDisabled}
+                    iconRender={(visible) =>
+                      visible ? (
+                        <EyeOutlined onClick={togglePasswordVisibility} />
+                      ) : (
+                        <EyeInvisibleOutlined onClick={togglePasswordVisibility} />
+                      )
+                    }
+                  />
                 </div>
                 <div className="submitBtn">
                   <Button onClick={handleSubmit}>Save Profile</Button>
