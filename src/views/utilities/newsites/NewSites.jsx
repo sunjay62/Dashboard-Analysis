@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Button, Modal, Form, Input } from 'antd';
+import { Button, Modal, Form, Input, Spin, Space } from 'antd';
 import MainCard from 'ui-component/cards/MainCard';
 import { Grid } from '@mui/material';
 import { gridSpacing } from 'store/constant';
@@ -28,6 +28,7 @@ const NewSite = () => {
   const [idDataValid, setIdDataValid] = useState(false);
   const [nameValid, setNameValid] = useState(false);
   const [ipValid, setIpValid] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -115,7 +116,7 @@ const NewSite = () => {
       })
       .then((res) => {
         console.log(res.data);
-
+        setLoading(false);
         setId(res.data.id);
         setNameEdit(res.data.name);
         setIpEdit(res.data.public_ip);
@@ -140,6 +141,7 @@ const NewSite = () => {
       .then((response) => {
         if (response.status === 200) {
           toast.success('Updated Successfully.');
+          setLoading(false);
           getApi();
           handleOkEdit();
         } else {
@@ -164,8 +166,10 @@ const NewSite = () => {
         const res = await axiosNew.get('/site', {
           headers
         });
+        setLoading(false);
         setUsers(res.data.data);
       } catch (err) {
+        setLoading(false);
         console.log(err);
       }
     };
@@ -189,6 +193,7 @@ const NewSite = () => {
       if (response.status === 200) {
         setName('');
         setIdData('');
+        setLoading(false);
         setIp('');
         toast.success('Registered Successfully.');
         getApi();
@@ -198,6 +203,7 @@ const NewSite = () => {
         setError('Failed to register, please try again.');
       }
     } catch (error) {
+      setLoading(false);
       console.error(error);
       setError('Failed to register, please try again.');
     }
@@ -264,9 +270,11 @@ const NewSite = () => {
         });
 
         // console.log(response.data);
+        setLoading(false);
         setUsers(response.data.data);
         // isMounted && setUsers(response.data.data);
       } catch (error) {
+        setLoading(false);
         console.log(error);
       }
     };
@@ -449,16 +457,31 @@ const NewSite = () => {
           </div>
         </Grid>
         <Grid item xs={12}>
-          <DataGrid
-            columns={columnSites.concat(actionColumn)}
-            rows={addIndex(users)}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 5 }
-              }
-            }}
-            pageSizeOptions={[5, 10, 50, 100]}
-          />
+          {loading ? (
+            <div className="loadingContainer">
+              <Space
+                direction="vertical"
+                style={{
+                  width: '100%'
+                }}
+              >
+                <Spin tip="Loading" size="large">
+                  <div className="content" />
+                </Spin>
+              </Space>
+            </div>
+          ) : (
+            <DataGrid
+              columns={columnSites.concat(actionColumn)}
+              rows={addIndex(users)}
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 5 }
+                }
+              }}
+              pageSizeOptions={[5, 10, 50, 100]}
+            />
+          )}
         </Grid>
       </Grid>
     </MainCard>

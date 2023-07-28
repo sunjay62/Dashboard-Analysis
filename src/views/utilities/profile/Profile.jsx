@@ -3,7 +3,7 @@ import './profile.scss';
 import MainCard from 'ui-component/cards/MainCard';
 import { Grid } from '@mui/material';
 import { gridSpacing } from 'store/constant';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, Spin, Space } from 'antd';
 import UserContext from 'UserContext';
 import useAxiosPrivate from 'hooks/useAxiosPrivate';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +26,7 @@ const Profile = () => {
   const userRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordDisabled, setShowPasswordDisabled] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setShowPasswordDisabled(passwordDisabled);
@@ -54,10 +55,12 @@ const Profile = () => {
           setFullname(response.data.fullname);
           setId(response.data.id);
           setActive(response.data.active);
+          setLoading(false);
           localStorage.setItem('user', JSON.stringify(response.data));
         })
         .catch((error) => {
           console.error('Failed to fetch user data:', error);
+          setLoading(false);
         });
     }
   }, [user]);
@@ -72,6 +75,7 @@ const Profile = () => {
       setFullname(storedUser.fullname);
       setId(storedUser.id);
       setActive(storedUser.active);
+      setLoading(false);
     }
   }, []);
 
@@ -96,13 +100,16 @@ const Profile = () => {
           setId(updatedUserData.id);
           setActive(updatedUserData.active);
           localStorage.setItem('user', JSON.stringify(response.data));
+          setLoading(false);
         } else {
           toast.error('Failed to update, please try again.');
+          setLoading(false);
         }
       })
       .catch((err) => {
         toast.error('Failed to update, please try again.');
         console.log(err);
+        setLoading(false);
       });
   };
 
@@ -131,70 +138,85 @@ const Profile = () => {
             <h2>Setting Profile</h2>
           </div>
         </Grid>
-        <Grid item xs={12} className="containerBottomProfile">
-          <div className="profileLeft">
-            <div className="imgContainer"></div>
-            <p>{fullname}</p>
-            <p>{id}</p>
+        {loading ? (
+          <div className="loadingContainer">
+            <Space
+              direction="vertical"
+              style={{
+                width: '100%'
+              }}
+            >
+              <Spin tip="Loading" size="large">
+                <div className="content" />
+              </Spin>
+            </Space>
           </div>
-          <div className="profileRight">
-            <div className="rightTop">
-              <h3>
-                <button onClick={toHome}>
-                  <KeyboardBackspaceIcon />
-                  <span>Back to Home</span>
-                </button>
-              </h3>
-              <h3>
-                <Checkbox checked={componentDisabled} onChange={(e) => setComponentDisabled(e.target.checked)}>
-                  Edit Profile
-                </Checkbox>
-              </h3>
+        ) : (
+          <Grid item xs={12} className="containerBottomProfile">
+            <div className="profileLeft">
+              <div className="imgContainer"></div>
+              <p>{fullname}</p>
+              <p>{id}</p>
             </div>
-            <div className="rightMiddle">
-              <Form disabled={!componentDisabled}>
-                <div className="input">
-                  <label htmlFor="id">ID :</label>
-                  <Input id="id" value={id} disabled />
-                </div>
-                <div className="input">
-                  <label htmlFor="fullname">Full Name :</label>
-                  <Input id="fullname" value={fullname} onChange={handleNameChangeEdit} />
-                </div>
-                <div className="input">
-                  <label htmlFor="email">Email :</label>
-                  <Input id="email" value={email} onChange={handleEmailChangeEdit} />
-                </div>
-                <div className="input">
-                  <label htmlFor="status">Status :</label>
-                  <Input id="status" value={active ? 'Active' : 'Disable'} disabled />
-                </div>
-                <div className="input">
-                  <Checkbox checked={passwordDisabled} onChange={(e) => setPasswordDisabled(e.target.checked)}>
-                    Edit Password :
+            <div className="profileRight">
+              <div className="rightTop">
+                <h3>
+                  <button onClick={toHome}>
+                    <KeyboardBackspaceIcon />
+                    <span>Back to Home</span>
+                  </button>
+                </h3>
+                <h3>
+                  <Checkbox checked={componentDisabled} onChange={(e) => setComponentDisabled(e.target.checked)}>
+                    Edit Profile
                   </Checkbox>
-                  <Input.Password
-                    id="password"
-                    value={password}
-                    onChange={handlePasswordChangeEdit}
-                    disabled={!showPasswordDisabled}
-                    iconRender={(visible) =>
-                      visible ? (
-                        <EyeOutlined onClick={togglePasswordVisibility} />
-                      ) : (
-                        <EyeInvisibleOutlined onClick={togglePasswordVisibility} />
-                      )
-                    }
-                  />
-                </div>
-                <div className="submitBtn">
-                  <Button onClick={handleSubmit}>Save Profile</Button>
-                </div>
-              </Form>
+                </h3>
+              </div>
+              <div className="rightMiddle">
+                <Form disabled={!componentDisabled}>
+                  <div className="input">
+                    <label htmlFor="id">ID :</label>
+                    <Input id="id" value={id} disabled />
+                  </div>
+                  <div className="input">
+                    <label htmlFor="fullname">Full Name :</label>
+                    <Input id="fullname" value={fullname} onChange={handleNameChangeEdit} />
+                  </div>
+                  <div className="input">
+                    <label htmlFor="email">Email :</label>
+                    <Input id="email" value={email} onChange={handleEmailChangeEdit} />
+                  </div>
+                  <div className="input">
+                    <label htmlFor="status">Status :</label>
+                    <Input id="status" value={active ? 'Active' : 'Disable'} disabled />
+                  </div>
+                  <div className="input">
+                    <Checkbox checked={passwordDisabled} onChange={(e) => setPasswordDisabled(e.target.checked)}>
+                      Edit Password :
+                    </Checkbox>
+                    <Input.Password
+                      id="password"
+                      value={password}
+                      onChange={handlePasswordChangeEdit}
+                      disabled={!showPasswordDisabled}
+                      iconRender={(visible) =>
+                        visible ? (
+                          <EyeOutlined onClick={togglePasswordVisibility} />
+                        ) : (
+                          <EyeInvisibleOutlined onClick={togglePasswordVisibility} />
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="submitBtn">
+                    <Button onClick={handleSubmit}>Save Profile</Button>
+                  </div>
+                </Form>
+              </div>
+              <div className="rightBottom"></div>
             </div>
-            <div className="rightBottom"></div>
-          </div>
-        </Grid>
+          </Grid>
+        )}
       </Grid>
     </MainCard>
   );

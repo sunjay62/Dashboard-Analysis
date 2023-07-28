@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Button, Modal, Form, Input } from 'antd';
+import { Button, Modal, Form, Input, Spin, Space } from 'antd';
 import MainCard from 'ui-component/cards/MainCard';
 import { Grid } from '@mui/material';
 import { gridSpacing } from 'store/constant';
@@ -28,6 +28,7 @@ const Account = () => {
   const [emailValid, setEmailValid] = useState(false);
   const [passwordValid, setPasswordValid] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   const handleShowEdit = (id) => {
     navigate(`/edit/profile/${id}`);
@@ -103,9 +104,11 @@ const Account = () => {
         const res = await axiosPrivate.get('/administrator', {
           headers
         });
+        setLoading(false);
         setUsers(res.data.data);
       } catch (err) {
         console.log(err);
+        setLoading(false);
       }
     };
     fetchAllUsers();
@@ -132,14 +135,18 @@ const Account = () => {
         setEmail('');
         setPassword('');
         toast.success('Registered Successfully.');
+        setLoading(false);
         getApi();
       } else if (response.status === 409) {
         toast.error('User already exists.');
+        setLoading(false);
       } else {
         setError('Failed to register, please try again.');
+        setLoading(false);
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
       setError('Failed to register, please try again.');
     }
   };
@@ -190,11 +197,14 @@ const Account = () => {
       // console.log('deleted clicked');
       if (res.status === 200) {
         toast.success('Deleted Successfuly.');
+        setLoading(false);
         getApi();
       } else {
         toast.error('Failed to delete user, please try again.');
+        setLoading(false);
       }
     } catch (err) {
+      setLoading(false);
       console.log(err);
     }
   };
@@ -214,6 +224,7 @@ const Account = () => {
         });
 
         // console.log(response.data);
+        setLoading(false);
         setUsers(response.data.data);
         // isMounted && setUsers(response.data.data);
       } catch (error) {
@@ -372,16 +383,31 @@ const Account = () => {
           </div>
         </Grid>
         <Grid item xs={12}>
-          <DataGrid
-            columns={columnSites.concat(actionColumn)}
-            rows={addIndex(users)}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 5 }
-              }
-            }}
-            pageSizeOptions={[5, 10, 50, 100]}
-          />
+          {loading ? (
+            <div className="loadingContainer">
+              <Space
+                direction="vertical"
+                style={{
+                  width: '100%'
+                }}
+              >
+                <Spin tip="Loading" size="large">
+                  <div className="content" />
+                </Spin>
+              </Space>
+            </div>
+          ) : (
+            <DataGrid
+              columns={columnSites.concat(actionColumn)}
+              rows={addIndex(users)}
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 5 }
+                }
+              }}
+              pageSizeOptions={[5, 10, 50, 100]}
+            />
+          )}
         </Grid>
       </Grid>
     </MainCard>

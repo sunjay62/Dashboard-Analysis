@@ -8,7 +8,6 @@ import { pdf, Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer
 import { Image as PDFImage } from '@react-pdf/renderer';
 import html2canvas from 'html2canvas';
 import ApexCharts from 'apexcharts';
-// import { SearchOutlined } from '@ant-design/icons';
 import SubCard from 'ui-component/cards/SubCard';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
