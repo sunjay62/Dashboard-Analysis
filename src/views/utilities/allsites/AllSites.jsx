@@ -1,4 +1,4 @@
-import { DatePicker, Space, Dropdown, AutoComplete, Input, Spin } from 'antd';
+import { DatePicker, Space, Dropdown, AutoComplete, Spin } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Tooltip } from '@material-ui/core';
@@ -212,7 +212,7 @@ const AllSites = () => {
         );
       };
 
-      const downloadPromise = pdf(<MyDocument tableData={tableData} />)
+      pdf(<MyDocument tableData={tableData} />)
         .toBlob()
         .then((blob) => {
           const blobUrl = URL.createObjectURL(blob);
@@ -222,19 +222,11 @@ const AllSites = () => {
           link.click();
 
           // Returning a message will be shown on successful resolution of the promise
-          return 'Download Successful!';
         })
         .catch((error) => {
           console.error(error);
           throw new Error('Failed to generate the PDF. Please try again.');
         });
-
-      // Show loading toast while the download is in progress
-      toast.promise(downloadPromise, {
-        loading: 'Downloading...', // Message shown while the download is in progress
-        success: 'Download Successful!', // Message shown when the download is successful
-        error: 'Failed to download PDF. Please try again.' // Message shown when there is an error during the download
-      });
     } catch (error) {
       console.error(error);
       toast.error('Failed to download PDF. Please try again.');
@@ -369,7 +361,7 @@ const AllSites = () => {
       case '2':
         // Download PDF
         // Implement the logic to download the PDF here
-
+        handleLoading();
         await downloadPDF();
         break;
       case '3':
@@ -385,6 +377,18 @@ const AllSites = () => {
       default:
         break;
     }
+  };
+
+  const handleLoading = () => {
+    toast.promise(
+      // Fungsi yang akan dijalankan untuk promise
+      () => new Promise((resolve) => setTimeout(resolve, 3000)),
+      {
+        pending: 'Downloading ...', // Pesan yang ditampilkan ketika promise sedang berjalan
+        success: 'Download Successfuly!', // Pesan yang ditampilkan ketika promise berhasil diselesaikan
+        error: 'Download Failed, Please Try Again!' // Pesan yang ditampilkan ketika promise gagal
+      }
+    );
   };
 
   const items = [
@@ -606,15 +610,7 @@ const AllSites = () => {
               </Dropdown.Button>
             </Space>
           </div>
-          <AutoComplete
-            style={{
-              width: 300
-            }}
-            onSelect={onSelect}
-            onSearch={handleSearch}
-          >
-            <Input.Search size="large" placeholder="Search" enterButton />
-          </AutoComplete>
+          <AutoComplete style={{ width: 250 }} placeholder="Search" onSelect={onSelect} onSearch={handleSearch} />
         </div>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={12} id="chartContainer">

@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
 import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
-
+import useAxiosPrivate from '../../../hooks/useAxiosPrivate';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
@@ -41,6 +42,29 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const TotalIncomeLightCard = ({ isLoading }) => {
   const theme = useTheme();
+  const axiosPrivate = useAxiosPrivate();
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const accessToken = localStorage.getItem('access_token');
+
+      try {
+        const response = await axiosPrivate.get('/administrator', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: accessToken
+          }
+        });
+        // console.log(response.data);
+        // console.log(response.data.data.length);
+        setData(response.data.data.length);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -70,7 +94,7 @@ const TotalIncomeLightCard = ({ isLoading }) => {
                     mt: 0.45,
                     mb: 0.45
                   }}
-                  primary={<Typography variant="h4">40</Typography>}
+                  primary={<Typography variant="h4">{data}</Typography>}
                   secondary={
                     <Typography
                       variant="subtitle2"

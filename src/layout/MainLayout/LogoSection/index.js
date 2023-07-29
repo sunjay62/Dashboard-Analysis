@@ -1,12 +1,9 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
-// material-ui
+import Logo2 from '../../../../src/assets/images/JakWiFi-logo.png';
 import { ButtonBase } from '@mui/material';
-
-// project imports
 import config from 'config';
-// import Logo from 'ui-component/Logo';
 import { MENU_OPEN } from 'store/actions';
 
 // ==============================|| MAIN LOGO ||============================== //
@@ -14,9 +11,16 @@ import { MENU_OPEN } from 'store/actions';
 const LogoSection = () => {
   const defaultId = useSelector((state) => state.customization.defaultId);
   const dispatch = useDispatch();
+
   return (
-    <ButtonBase disableRipple onClick={() => dispatch({ type: MENU_OPEN, id: defaultId })} component={Link} to={config.defaultPath}>
-      <h2>JakWiFi</h2>
+    <ButtonBase
+      disableRipple
+      onClick={() => dispatch({ type: MENU_OPEN, id: defaultId })}
+      component={Link}
+      to={config.defaultPath}
+      style={{ textAlign: 'left' }}
+    >
+      <img src={Logo2} alt="" style={{ width: '50%', marginLeft: '-100px' }} />
     </ButtonBase>
   );
 };

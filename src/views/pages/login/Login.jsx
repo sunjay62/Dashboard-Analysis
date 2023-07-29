@@ -9,7 +9,8 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Logo from '../../../../src/assets/images/logotachyon-new.png';
+import Logo from '../../../../src/assets/images/logotachyon-old.png';
+import Logo2 from '../../../../src/assets/images/JakWiFi-logo.png';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -103,7 +104,10 @@ export default function Login() {
         />
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square className="container_Login_Main">
           <Box className="container_Login">
-            <img src={Logo} alt="" className="logo" />
+            <div className="logo">
+              <img src={Logo2} alt="" className="logo2" />
+              <img src={Logo} alt="" className="logo1" />
+            </div>
             <Typography component="h1" variant="h5" className="welcomeLogin">
               Hi, Welcome Back
             </Typography>

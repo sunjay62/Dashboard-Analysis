@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
 import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
@@ -43,6 +44,35 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const TotalIncomeDarkCard = ({ isLoading }) => {
   const theme = useTheme();
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    const endpoint = `http://172.16.25.50:8080/ngasal/report/monthly/${currentMonth}/${currentYear}/darat/raw/`;
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(endpoint, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log(response.data);
+
+        // Menghitung total data device dengan menjumlahkan semua devicenya
+        const totalDataDevice = response.data.reduce((total, item) => total + item.device, 0);
+        // console.log('Total Data Device:', totalDataDevice);
+        setData(totalDataDevice);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -74,12 +104,12 @@ const TotalIncomeDarkCard = ({ isLoading }) => {
                   }}
                   primary={
                     <Typography variant="h4" sx={{ color: '#fff' }}>
-                      2522
+                      {data}
                     </Typography>
                   }
                   secondary={
                     <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                      Total Devices
+                      Total Devices Connected
                     </Typography>
                   }
                 />
