@@ -34,7 +34,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import User1 from 'assets/images/admin.jpg';
-
+import LoadingScreen from 'views/utilities/loadingscreen/LoadingScreen';
 // assets
 import { IconLogout, IconSearch, IconSettings } from '@tabler/icons';
 // import useAxiosPrivate from 'hooks/useAxiosPrivate';
@@ -56,10 +56,15 @@ const ProfileSection = () => {
    * anchorRef is used on different componets and specifying one type leads to other components throwing an error
    * */
   const anchorRef = useRef(null);
+  const [loadingLogout, setLoadingLogout] = useState(false);
+
   const handleLogout = async () => {
+    setLoadingLogout(true);
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    navigate('/login');
+    setTimeout(() => {
+      navigate('/login');
+    }, 1000);
   };
   // const handleSettingProfile = async () => {
   //   navigate('/setting/profile');
@@ -303,6 +308,7 @@ const ProfileSection = () => {
                           </ListItemIcon>
                           <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
                         </ListItemButton>
+                        {loadingLogout && <LoadingScreen />}
                       </List>
                     </Box>
                   </PerfectScrollbar>

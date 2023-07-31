@@ -20,6 +20,8 @@ import './login.scss';
 import useAxiosPrivate from 'hooks/useAxiosPrivate';
 import { useNavigate } from 'react-router-dom';
 import UserContext from 'UserContext';
+import LoadingScreen from 'views/utilities/loadingscreen/LoadingScreen';
+import { toast } from 'react-toastify';
 
 function Copyright(props) {
   return (
@@ -43,6 +45,7 @@ export default function Login() {
   const axiosPrivate = useAxiosPrivate(); // const refresh = useRefreshToken();
   const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -54,6 +57,7 @@ export default function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setLoading(true); // Show the loader when submitting the form
       const response = await axiosPrivate.post('/administrator/login', {
         email,
         password,
@@ -69,15 +73,21 @@ export default function Login() {
         // Set user data in the local state
         setUser(response.data);
         setTokens(response.data.access_token, response.data.refresh_token);
+
+        // Navigate to the /home page after successful login
         navigate('/home');
       } else {
         console.log('Invalid response data:', response.data);
+        toast.error('Invalid email or password.');
       }
+      setLoading(false); // Hide the loader after the API call is completed
     } catch (error) {
       if (error.response === 401) {
         alert('Invalid email or password');
+        toast.error('Invalid email or password.');
       }
       console.error(error);
+      setLoading(false); // Hide the loader if there was an error during the login process
     }
   };
 
@@ -87,6 +97,7 @@ export default function Login() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
+      {loading && <LoadingScreen />}
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
@@ -151,7 +162,7 @@ export default function Login() {
                 label="Remember me"
               />
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 1, mb: 2 }}>
-                Sign In
+                {loading ? 'Signing In...' : 'Sign In'}
               </Button>
               <Grid container>
                 <Grid item xs>
