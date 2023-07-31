@@ -134,6 +134,18 @@ const Sites = () => {
     handleSearchOnLoad();
   }, []);
 
+  const handleLoading = () => {
+    toast.promise(
+      // Fungsi yang akan dijalankan untuk promise
+      () => new Promise((resolve) => setTimeout(resolve, 3000)),
+      {
+        pending: 'Downloading ...', // Pesan yang ditampilkan ketika promise sedang berjalan
+        success: 'Download Successfuly!', // Pesan yang ditampilkan ketika promise berhasil diselesaikan
+        error: 'Download Failed, Please Try Again!' // Pesan yang ditampilkan ketika promise gagal
+      }
+    );
+  };
+
   const onMenuClick = async (e) => {
     const { key } = e;
 
@@ -146,6 +158,7 @@ const Sites = () => {
       case '2':
         // Download PDF
         // Implement the logic to download the PDF here
+        handleLoading();
         await downloadPDF();
         break;
       case '3':
@@ -713,7 +726,6 @@ const Sites = () => {
           console.error(error);
           toast.error('Failed to generate the PDF. Please try again.');
         });
-      toast.success('Download Successfully!');
     } catch (error) {
       console.error(error);
       toast.error('Failed to download PDF. Please try again.');

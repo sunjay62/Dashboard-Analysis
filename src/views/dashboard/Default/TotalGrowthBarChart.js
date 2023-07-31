@@ -51,6 +51,12 @@ const TotalGrowthBarChart = ({ isLoading }) => {
   const secondaryMain = theme.palette.secondary.main;
   const secondaryLight = theme.palette.secondary.light;
 
+  const apexChartMenuStyle = `
+    .apexcharts-menu-icon {
+      display: none;
+    }
+  `;
+
   useEffect(() => {
     const newChartData = {
       ...chartData.options,
@@ -86,6 +92,16 @@ const TotalGrowthBarChart = ({ isLoading }) => {
     if (!isLoading) {
       ApexCharts.exec(`bar-chart`, 'updateOptions', newChartData);
     }
+
+    // Menambahkan style untuk menghilangkan ikon menu
+    const styleTag = document.createElement('style');
+    styleTag.innerHTML = apexChartMenuStyle;
+    document.head.appendChild(styleTag);
+
+    // Clean up: hapus style ketika komponen di-unmount
+    return () => {
+      document.head.removeChild(styleTag);
+    };
   }, [navType, primary200, primaryDark, secondaryMain, secondaryLight, primary, darkLight, grey200, isLoading, grey500]);
 
   return (

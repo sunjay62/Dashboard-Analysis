@@ -18,9 +18,9 @@ const LogoSection = () => {
       onClick={() => dispatch({ type: MENU_OPEN, id: defaultId })}
       component={Link}
       to={config.defaultPath}
-      style={{ textAlign: 'left' }}
+      className="containerLogo"
     >
-      <img src={Logo2} alt="" style={{ width: '50%', marginLeft: '-100px' }} />
+      <img src={Logo2} alt="" className="logoJakwifi" style={{ width: '55%' }} />
     </ButtonBase>
   );
 };
