@@ -81,7 +81,7 @@ const TotalOrderLineChartCard = ({ isLoading }) => {
       unitIndex++;
     }
 
-    return formattedValue.toFixed(2) + ' ' + units[unitIndex];
+    return formattedValue.toFixed(1) + ' ' + units[unitIndex];
   };
 
   const convertBandwidthToNumber = (bandwidth) => {
